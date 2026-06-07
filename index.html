@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>StitchLink - Premium Tailoring</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --primary-light: #3b82f6;
+            --gold: #fbbf24;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #0f172a;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: #e2e8f0; display: flex; justify-content: center; min-height: 100vh; }
+        
+        /* Mobile Container */
+        .app-container {
+            width: 100%; max-width: 430px; background: var(--bg); min-height: 100vh; position: relative;
+            box-shadow: 0 0 40px rgba(0,0,0,0.1); overflow-x: hidden; padding-bottom: 80px;
+        }
+
+        /* Screens */
+        .screen { display: none; animation: fadeIn 0.3s ease; }
+        .screen.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Login Screen */
+        .login-bg {
+            background: linear-gradient(135deg, var(--primary) 0%, #0f172a 100%);
+            min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; color: white;
+        }
+        .login-logo { width: 80px; height: 80px; background: var(--gold); border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 40px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(251, 191, 36, 0.3); }
+        .login-card { background: white; border-radius: 24px; padding: 30px; width: 100%; color: var(--text); margin-top: 40px; }
+        .input-group { margin-bottom: 15px; position: relative; }
+        .input-group i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-light); }
+        .input-field { width: 100%; padding: 15px 15px 15px 45px; border: 2px solid var(--border); border-radius: 12px; font-size: 15px; outline: none; transition: 0.3s; }
+        .input-field:focus { border-color: var(--primary); }
+        .btn-primary { width: 100%; padding: 16px; background: var(--primary); color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 10px; transition: 0.3s; }
+        .btn-primary:active { transform: scale(0.98); }
+
+        /* Headers */
+        .header { padding: 20px; display: flex; justify-content: space-between; align-items: center; background: white; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }        .header h1 { font-size: 22px; color: var(--text); }
+        .icon-btn { width: 40px; height: 40px; background: var(--bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--text); cursor: pointer; }
+
+        /* Search */
+        .search-bar { margin: 0 20px 20px; padding: 14px 18px; background: white; border-radius: 14px; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
+        .search-bar input { border: none; outline: none; flex: 1; font-size: 14px; }
+
+        /* Hero Banner */
+        .hero { margin: 0 20px 25px; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); border-radius: 24px; padding: 25px; color: white; position: relative; overflow: hidden; }
+        .hero::after { content: '✂️'; position: absolute; right: -20px; bottom: -20px; font-size: 120px; opacity: 0.1; transform: rotate(-15deg); }
+        .hero h2 { font-size: 22px; margin-bottom: 8px; position: relative; z-index: 1; }
+        .hero p { font-size: 14px; opacity: 0.9; margin-bottom: 18px; position: relative; z-index: 1; }
+        .hero-btn { background: var(--gold); color: var(--text); padding: 10px 20px; border: none; border-radius: 20px; font-weight: 700; cursor: pointer; position: relative; z-index: 1; }
+
+        /* Features Grid */
+        .features { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; padding: 0 20px; margin-bottom: 30px; }
+        .feature { text-align: center; cursor: pointer; }
+        .feature-icon { width: 55px; height: 55px; background: white; border-radius: 16px; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; font-size: 22px; color: var(--primary); box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: 0.3s; }
+        .feature:active .feature-icon { transform: scale(0.95); }
+        .feature-label { font-size: 11px; color: var(--text-light); font-weight: 500; }
+
+        /* Section Title */
+        .section-title { padding: 0 20px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .section-title h3 { font-size: 18px; color: var(--text); font-weight: 700; }
+        .section-title a { color: var(--primary-light); font-size: 13px; text-decoration: none; font-weight: 600; }
+
+        /* Tailor Cards */
+        .tailor-list { padding: 0 20px; display: flex; flex-direction: column; gap: 12px; }
+        .tailor-card { background: white; border-radius: 16px; padding: 15px; display: flex; gap: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); cursor: pointer; transition: 0.3s; }
+        .tailor-card:active { transform: scale(0.98); }
+        .tailor-img { width: 70px; height: 70px; border-radius: 14px; background: linear-gradient(135deg, #e0e7ff, #c7d2fe); display: flex; align-items: center; justify-content: center; font-size: 30px; flex-shrink: 0; }
+        .tailor-info { flex: 1; }
+        .tailor-info h4 { font-size: 16px; margin-bottom: 4px; display: flex; align-items: center; gap: 5px; }
+        .verified { color: var(--primary-light); font-size: 14px; }
+        .tailor-info p { font-size: 12px; color: var(--text-light); margin-bottom: 8px; }
+        .tailor-meta { display: flex; justify-content: space-between; align-items: center; }
+        .rating { font-size: 13px; font-weight: 600; color: var(--text); }
+        .rating i { color: var(--gold); }
+        .price { color: var(--primary); font-weight: 700; font-size: 14px; }
+
+        /* Profile */
+        .profile-header { text-align: center; padding: 30px 20px; background: white; border-radius: 0 0 30px 30px; margin-bottom: 20px; }
+        .avatar { width: 90px; height: 90px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--primary-light)); margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; color: white; font-size: 36px; font-weight: 700; border: 4px solid var(--gold); }
+        .profile-header h2 { font-size: 20px; margin-bottom: 5px; }
+        .profile-header p { color: var(--text-light); font-size: 14px; margin-bottom: 12px; }
+        .badge { display: inline-block; background: #e0e7ff; color: var(--primary); padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 0 20px; margin-bottom: 25px; }
+        .stat-box { background: white; padding: 18px 10px; border-radius: 16px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
+        .stat-box .num { font-size: 22px; font-weight: 800; color: var(--primary); margin-bottom: 4px; }
+        .stat-box .lbl { font-size: 11px; color: var(--text-light); }
+        /* Menu List */
+        .menu-list { margin: 0 20px; background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
+        .menu-item { padding: 18px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid var(--border); cursor: pointer; }
+        .menu-item:last-child { border-bottom: none; }
+        .menu-icon { width: 42px; height: 42px; background: #e0e7ff; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 18px; }
+        .menu-info { flex: 1; }
+        .menu-info h4 { font-size: 15px; margin-bottom: 3px; }
+        .menu-info p { font-size: 12px; color: var(--text-light); }
+
+        /* Orders */
+        .order-card { margin: 0 20px 15px; background: white; border-radius: 20px; padding: 18px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
+        .order-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+        .order-head h4 { font-size: 16px; margin-bottom: 4px; }
+        .order-head p { font-size: 12px; color: var(--text-light); }
+        .status-tag { padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+        .status-tag.progress { background: #fef3c7; color: #d97706; }
+        .status-tag.done { background: #d1fae5; color: #059669; }
+        .tracking-line { display: flex; justify-content: space-between; margin: 15px 0; position: relative; }
+        .tracking-line::before { content: ''; position: absolute; top: 12px; left: 10px; right: 10px; height: 2px; background: var(--border); z-index: 0; }
+        .track-step { text-align: center; flex: 1; position: relative; z-index: 1; }
+        .track-dot { width: 26px; height: 26px; border-radius: 50%; background: var(--border); color: white; display: flex; align-items: center; justify-content: center; margin: 0 auto 6px; font-size: 12px; }
+        .track-dot.active { background: var(--primary); }
+        .track-step label { font-size: 10px; font-weight: 600; display: block; }
+        .track-step span { font-size: 9px; color: var(--text-light); }
+        .order-foot { display: flex; justify-content: space-between; align-items: center; padding-top: 15px; border-top: 1px solid var(--border); }
+        .order-foot .price { font-size: 18px; font-weight: 800; }
+
+        /* Messages */
+        .chat-item { margin: 0 20px 12px; background: white; border-radius: 16px; padding: 15px; display: flex; align-items: center; gap: 14px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); cursor: pointer; }
+        .chat-avatar { width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #e0e7ff, #c7d2fe); display: flex; align-items: center; justify-content: center; font-size: 22px; position: relative; flex-shrink: 0; }
+        .online { position: absolute; bottom: 2px; right: 2px; width: 12px; height: 12px; background: var(--success); border-radius: 50%; border: 2px solid white; }
+        .chat-info { flex: 1; min-width: 0; }
+        .chat-info h4 { font-size: 15px; margin-bottom: 4px; }
+        .chat-info p { font-size: 13px; color: var(--text-light); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .chat-meta { text-align: right; }
+        .chat-meta .time { font-size: 11px; color: var(--text-light); margin-bottom: 6px; display: block; }
+        .unread { background: var(--primary); color: white; width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
+
+        /* Place Order */
+        .steps { display: flex; justify-content: space-between; padding: 20px; background: white; margin-bottom: 20px; position: relative; }
+        .steps::before { content: ''; position: absolute; top: 32px; left: 40px; right: 40px; height: 2px; background: var(--border); }
+        .step { text-align: center; flex: 1; position: relative; z-index: 1; }
+        .step-circle { width: 30px; height: 30px; border-radius: 50%; background: var(--border); color: var(--text-light); display: flex; align-items: center; justify-content: center; margin: 0 auto 6px; font-size: 13px; font-weight: 700; }
+        .step.active .step-circle { background: var(--primary); color: white; }
+        .step label { font-size: 10px; font-weight: 600; color: var(--text-light); }
+        .step.active label { color: var(--primary); }
+        .form-content { padding: 0 20px; }
+        .upload-box { border: 2px dashed var(--primary-light); border-radius: 16px; padding: 40px 20px; text-align: center; background: #eef2ff; margin-bottom: 20px; cursor: pointer; }
+        .upload-box i { font-size: 40px; color: var(--primary); margin-bottom: 10px; }        .upload-box h4 { color: var(--primary); margin-bottom: 5px; }
+        .upload-box p { font-size: 12px; color: var(--text-light); }
+        .form-label { font-size: 14px; font-weight: 700; margin-bottom: 8px; display: block; }
+        .form-input { width: 100%; padding: 14px; border: 2px solid var(--border); border-radius: 12px; font-size: 14px; outline: none; margin-bottom: 15px; }
+        .form-input:focus { border-color: var(--primary); }
+        textarea.form-input { min-height: 120px; resize: none; }
+
+        /* Bottom Nav */
+        .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; background: white; display: flex; justify-content: space-around; padding: 12px 0 25px; box-shadow: 0 -4px 20px rgba(0,0,0,0.08); z-index: 1000; border-radius: 24px 24px 0 0; }
+        .nav-item { flex: 1; text-align: center; cursor: pointer; padding: 5px; transition: 0.3s; }
+        .nav-item i { font-size: 22px; color: var(--text-light); display: block; margin-bottom: 4px; transition: 0.3s; }
+        .nav-item span { font-size: 10px; font-weight: 600; color: var(--text-light); transition: 0.3s; }
+        .nav-item.active i, .nav-item.active span { color: var(--primary); }
+        .nav-center { width: 55px; height: 55px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-top: -30px; box-shadow: 0 8px 20px rgba(30, 58, 138, 0.4); }
+        .nav-center i { color: white; font-size: 24px; margin: 0; }
+
+        /* Toast */
+        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: var(--text); color: white; padding: 14px 24px; border-radius: 12px; font-size: 14px; font-weight: 600; z-index: 9999; transition: 0.3s; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+        .toast.success { background: var(--success); }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <!-- LOGIN SCREEN -->
+    <div class="screen active" id="loginScreen">
+        <div class="login-bg">
+            <div class="login-logo">✂️</div>
+            <h1 style="font-size: 28px; margin-bottom: 5px;">StitchLink</h1>
+            <p style="opacity: 0.8; font-size: 14px;">Premium Tailoring Marketplace</p>
+            
+            <div class="login-card">
+                <h2 style="margin-bottom: 5px;">Welcome Back</h2>
+                <p style="color: var(--text-light); font-size: 14px; margin-bottom: 25px;">Sign in to continue</p>
+                
+                <div class="input-group">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" class="input-field" placeholder="Email Address" id="loginEmail">
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" class="input-field" placeholder="Password" id="loginPass">
+                </div>
+                                <button class="btn-primary" onclick="handleLogin()">Sign In</button>
+                <p style="text-align: center; margin-top: 20px; font-size: 13px; color: var(--text-light);">
+                    Don't have an account? <a href="#" style="color: var(--primary); font-weight: 600; text-decoration: none;" onclick="showToast('Signup coming soon!')">Sign Up</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- HOME SCREEN -->
+    <div class="screen" id="homeScreen">
+        <div class="header">
+            <div>
+                <p style="font-size: 13px; color: var(--text-light);">Good morning 👋</p>
+                <h1>Find your tailor</h1>
+            </div>
+            <div class="icon-btn" onclick="showToast('No new notifications', 'success')"><i class="fas fa-bell"></i></div>
+        </div>
+
+        <div class="search-bar">
+            <i class="fas fa-search" style="color: var(--text-light);"></i>
+            <input type="text" placeholder="Search tailors, designs...">
+            <i class="fas fa-sliders-h" style="color: var(--primary);"></i>
+        </div>
+
+        <div class="hero">
+            <h2>Find trusted tailors near you</h2>
+            <p>Quality stitching, delivered on time.</p>
+            <button class="hero-btn" onclick="showToast('Exploring tailors...', 'success')">Explore Tailors →</button>
+        </div>
+
+        <div class="features">
+            <div class="feature" onclick="showToast('Browse Tailors', 'success')"><div class="feature-icon"><i class="fas fa-cut"></i></div><div class="feature-label">Browse</div></div>
+            <div class="feature" onclick="navigate('placeOrderScreen')"><div class="feature-icon"><i class="fas fa-ruler-combined"></i></div><div class="feature-label">Measure</div></div>
+            <div class="feature" onclick="navigate('ordersScreen')"><div class="feature-icon"><i class="fas fa-clipboard-list"></i></div><div class="feature-label">Track</div></div>
+            <div class="feature" onclick="navigate('messagesScreen')"><div class="feature-icon"><i class="fas fa-comment-dots"></i></div><div class="feature-label">Chat</div></div>
+            <div class="feature" onclick="showToast('Reviews', 'success')"><div class="feature-icon"><i class="fas fa-star"></i></div><div class="feature-label">Reviews</div></div>
+            <div class="feature" onclick="showToast('Secure Payments', 'success')"><div class="feature-icon"><i class="fas fa-shield-alt"></i></div><div class="feature-label">Secure</div></div>
+            <div class="feature" onclick="showToast('Updates', 'success')"><div class="feature-icon"><i class="fas fa-bell"></i></div><div class="feature-label">Updates</div></div>
+            <div class="feature" onclick="navigate('profileScreen')"><div class="feature-icon"><i class="fas fa-user"></i></div><div class="feature-label">Profile</div></div>
+        </div>
+
+        <div class="section-title">
+            <h3>Popular Tailors</h3>
+            <a href="#" onclick="showToast('View all', 'success')">View all</a>
+        </div>
+
+        <div class="tailor-list">
+            <div class="tailor-card" onclick="showToast('Opening Bashir Tailors...', 'success')">
+                <div class="tailor-img">👨‍🦱</div>
+                <div class="tailor-info">                    <h4>Bashir Tailors <i class="fas fa-check-circle verified"></i></h4>
+                    <p>Men's Wear Specialist • Maiduguri</p>
+                    <div class="tailor-meta">
+                        <div class="rating"><i class="fas fa-star"></i> 4.8 (120)</div>
+                        <div class="price">From ₦5,000</div>
+                    </div>
+                </div>
+            </div>
+            <div class="tailor-card" onclick="showToast('Opening Zee Stitches...', 'success')">
+                <div class="tailor-img" style="background: linear-gradient(135deg, #fce7f3, #fbcfe8);">👩🏽</div>
+                <div class="tailor-info">
+                    <h4>Zee Stitches <i class="fas fa-check-circle verified"></i></h4>
+                    <p>Kaftans & Women's Wear • Abuja</p>
+                    <div class="tailor-meta">
+                        <div class="rating"><i class="fas fa-star"></i> 4.7 (98)</div>
+                        <div class="price">From ₦4,000</div>
+                    </div>
+                </div>
+            </div>
+            <div class="tailor-card" onclick="showToast('Opening Aisha Designs...', 'success')">
+                <div class="tailor-img" style="background: linear-gradient(135deg, #d1fae5, #a7f3d0);">🏾‍</div>
+                <div class="tailor-info">
+                    <h4>Aisha Designs <i class="fas fa-check-circle verified"></i></h4>
+                    <p>Evening Gowns • Lagos</p>
+                    <div class="tailor-meta">
+                        <div class="rating"><i class="fas fa-star"></i> 4.9 (115)</div>
+                        <div class="price">From ₦6,000</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PROFILE SCREEN -->
+    <div class="screen" id="profileScreen">
+        <div class="header">
+            <h1>My Profile</h1>
+            <div class="icon-btn" onclick="showToast('Edit Profile', 'success')"><i class="fas fa-pen"></i></div>
+        </div>
+
+        <div class="profile-header">
+            <div class="avatar">M</div>
+            <h2 id="profileName">Musa Ibrahim</h2>
+            <p id="profileEmail">musa.ibrahim@email.com</p>
+            <span class="badge">📍 Maiduguri, Borno State</span>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-box"><div class="num">3</div><div class="lbl">Total Orders</div></div>
+            <div class="stat-box"><div class="num" style="color: var(--success);">1</div><div class="lbl">Completed</div></div>            <div class="stat-box"><div class="num">₦25k</div><div class="lbl">Total Spent</div></div>
+        </div>
+
+        <div class="menu-list">
+            <div class="menu-item" onclick="showToast('Measurements', 'success')">
+                <div class="menu-icon"><i class="fas fa-ruler-combined"></i></div>
+                <div class="menu-info"><h4>My Measurements</h4><p>Update body measurements</p></div>
+                <i class="fas fa-chevron-right" style="color: var(--text-light);"></i>
+            </div>
+            <div class="menu-item" onclick="showToast('Saved Tailors', 'success')">
+                <div class="menu-icon"><i class="fas fa-heart"></i></div>
+                <div class="menu-info"><h4>Saved Tailors</h4><p>3 tailors in wishlist</p></div>
+                <i class="fas fa-chevron-right" style="color: var(--text-light);"></i>
+            </div>
+            <div class="menu-item" onclick="showToast('Addresses', 'success')">
+                <div class="menu-icon"><i class="fas fa-map-marker-alt"></i></div>
+                <div class="menu-info"><h4>My Addresses</h4><p>Delivery locations</p></div>
+                <i class="fas fa-chevron-right" style="color: var(--text-light);"></i>
+            </div>
+            <div class="menu-item" onclick="showToast('Payments', 'success')">
+                <div class="menu-icon"><i class="fas fa-credit-card"></i></div>
+                <div class="menu-info"><h4>Payment Methods</h4><p>Manage cards & wallet</p></div>
+                <i class="fas fa-chevron-right" style="color: var(--text-light);"></i>
+            </div>
+            <div class="menu-item" onclick="handleLogout()">
+                <div class="menu-icon" style="background: #fee2e2; color: var(--danger);"><i class="fas fa-sign-out-alt"></i></div>
+                <div class="menu-info"><h4 style="color: var(--danger);">Logout</h4><p>Sign out of account</p></div>
+                <i class="fas fa-chevron-right" style="color: var(--text-light);"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- ORDERS SCREEN -->
+    <div class="screen" id="ordersScreen">
+        <div class="header">
+            <h1>My Orders</h1>
+            <div class="icon-btn" onclick="showToast('Filters', 'success')"><i class="fas fa-filter"></i></div>
+        </div>
+
+        <div class="stats-grid" style="margin-top: 10px;">
+            <div class="stat-box"><div class="num">3</div><div class="lbl">Total</div></div>
+            <div class="stat-box"><div class="num" style="color: #d97706;">1</div><div class="lbl">Active</div></div>
+            <div class="stat-box"><div class="num" style="color: var(--success);">1</div><div class="lbl">Ready</div></div>
+            <div class="stat-box"><div class="num" style="color: var(--text-light);">1</div><div class="lbl">Done</div></div>
+        </div>
+
+        <div class="order-card">
+            <div class="order-head">
+                <div>
+                    <h4>Senator Wear</h4>                    <p>Bashir Tailors</p>
+                </div>
+                <span class="status-tag progress">In Progress</span>
+            </div>
+            <div style="font-size: 12px; color: var(--text-light); margin-bottom: 10px;"> Order #SL12345 •  May 24, 2024</div>
+            <div class="tracking-line">
+                <div class="track-step"><div class="track-dot active"><i class="fas fa-check"></i></div><label>Placed</label><span>Apr 30</span></div>
+                <div class="track-step"><div class="track-dot active"><i class="fas fa-check"></i></div><label>Progress</label><span>May 02</span></div>
+                <div class="track-step"><div class="track-dot"></div><label>Ready</label><span>May 20</span></div>
+                <div class="track-step"><div class="track-dot"></div><label>Delivered</label><span>May 24</span></div>
+            </div>
+            <div class="order-foot">
+                <div class="price">₦7,500</div>
+                <a href="#" style="color: var(--primary); font-weight: 600; text-decoration: none;" onclick="showToast('Details', 'success')">View Details →</a>
+            </div>
+        </div>
+
+        <div class="order-card">
+            <div class="order-head">
+                <div>
+                    <h4>Kaftan</h4>
+                    <p>Zee Stitches</p>
+                </div>
+                <span class="status-tag done">Delivered</span>
+            </div>
+            <div style="font-size: 12px; color: var(--text-light); margin-bottom: 10px;">📄 Order #SL12289 • 🚚 Apr 20, 2024</div>
+            <div class="tracking-line">
+                <div class="track-step"><div class="track-dot active"><i class="fas fa-check"></i></div><label>Placed</label><span>Apr 10</span></div>
+                <div class="track-step"><div class="track-dot active"><i class="fas fa-check"></i></div><label>Progress</label><span>Apr 12</span></div>
+                <div class="track-step"><div class="track-dot active"><i class="fas fa-check"></i></div><label>Ready</label><span>Apr 18</span></div>
+                <div class="track-step"><div class="track-dot active"><i class="fas fa-check"></i></div><label>Delivered</label><span>Apr 20</span></div>
+            </div>
+            <div class="order-foot">
+                <div class="price">₦5,500</div>
+                <a href="#" style="color: var(--primary); font-weight: 600; text-decoration: none;" onclick="showToast('Details', 'success')">View Details →</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- MESSAGES SCREEN -->
+    <div class="screen" id="messagesScreen">
+        <div class="header">
+            <h1>Messages</h1>
+            <div class="icon-btn" onclick="showToast('New Message', 'success')"><i class="fas fa-pen"></i></div>
+        </div>
+
+        <div class="search-bar">
+            <i class="fas fa-search" style="color: var(--text-light);"></i>
+            <input type="text" placeholder="Search conversations...">
+        </div>
+        <div class="chat-item" onclick="showToast('Opening chat...', 'success')">
+            <div class="chat-avatar">👨🏾🦱<div class="online"></div></div>
+            <div class="chat-info">
+                <h4>Bashir Tailors</h4>
+                <p>Your Senator wear is ready for fitting...</p>
+            </div>
+            <div class="chat-meta">
+                <span class="time">10:32 AM</span>
+                <span class="unread">2</span>
+            </div>
+        </div>
+
+        <div class="chat-item" onclick="showToast('Opening chat...', 'success')">
+            <div class="chat-avatar" style="background: linear-gradient(135deg, #fce7f3, #fbcfe8);">👩🏽<div class="online"></div></div>
+            <div class="chat-info">
+                <h4>Zee Stitches</h4>
+                <p>Please send me your measurements again.</p>
+            </div>
+            <div class="chat-meta">
+                <span class="time">Yesterday</span>
+            </div>
+        </div>
+
+        <div class="chat-item" onclick="showToast('Opening chat...', 'success')">
+            <div class="chat-avatar" style="background: linear-gradient(135deg, #d1fae5, #a7f3d0);">👩🏾‍<div class="online"></div></div>
+            <div class="chat-info">
+                <h4>Aisha Designs</h4>
+                <p>Thank you for your order! We will begin...</p>
+            </div>
+            <div class="chat-meta">
+                <span class="time">May 2</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- PLACE ORDER SCREEN -->
+    <div class="screen" id="placeOrderScreen">
+        <div class="header">
+            <div class="icon-btn" onclick="navigate('homeScreen')"><i class="fas fa-arrow-left"></i></div>
+            <h1 style="flex: 1; text-align: center; margin-right: 40px;">New Order</h1>
+        </div>
+
+        <div class="steps">
+            <div class="step active" id="step1"><div class="step-circle">1</div><label>Design</label></div>
+            <div class="step" id="step2"><div class="step-circle">2</div><label>Measure</label></div>
+            <div class="step" id="step3"><div class="step-circle">3</div><label>Details</label></div>
+            <div class="step" id="step4"><div class="step-circle">4</div><label>Review</label></div>
+        </div>
+        <div class="form-content" id="formStep1">
+            <h2 style="margin-bottom: 5px;">Design Inspiration</h2>
+            <p style="color: var(--text-light); font-size: 14px; margin-bottom: 20px;">Tell your tailor about the design</p>
+            
+            <div class="upload-box" onclick="document.getElementById('fileInput').click()">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <h4>Upload Image</h4>
+                <p>PNG, JPG up to 10MB</p>
+                <input type="file" id="fileInput" style="display: none;" onchange="showToast('Image uploaded!', 'success')">
+            </div>
+
+            <label class="form-label">Design Description</label>
+            <textarea class="form-input" placeholder="Describe the design you want — style, color preferences..."></textarea>
+            
+            <button class="btn-primary" onclick="nextStep()">Continue</button>
+        </div>
+
+        <div class="form-content hidden" id="formStep2">
+            <h2 style="margin-bottom: 5px;">Measurements</h2>
+            <p style="color: var(--text-light); font-size: 14px; margin-bottom: 20px;">Add your body measurements</p>
+            
+            <label class="form-label">Chest (inches)</label>
+            <input type="number" class="form-input" placeholder="e.g., 40">
+            
+            <label class="form-label">Waist (inches)</label>
+            <input type="number" class="form-input" placeholder="e.g., 34">
+            
+            <label class="form-label">Hips (inches)</label>
+            <input type="number" class="form-input" placeholder="e.g., 38">
+            
+            <button class="btn-primary" onclick="nextStep()">Continue</button>
+        </div>
+
+        <div class="form-content hidden" id="formStep3">
+            <h2 style="margin-bottom: 5px;">Order Details</h2>
+            <p style="color: var(--text-light); font-size: 14px; margin-bottom: 20px;">Fill in the remaining details</p>
+            
+            <label class="form-label">Type of Clothing</label>
+            <select class="form-input">
+                <option>Select type</option>
+                <option>Senator Wear</option>
+                <option>Kaftan</option>
+                <option>Suit</option>
+                <option>Agbada</option>
+            </select>
+            
+            <label class="form-label">Delivery Date</label>
+            <input type="date" class="form-input">
+            
+            <button class="btn-primary" onclick="nextStep()">Continue</button>        </div>
+
+        <div class="form-content hidden" id="formStep4">
+            <h2 style="margin-bottom: 5px;">Review Order</h2>
+            <p style="color: var(--text-light); font-size: 14px; margin-bottom: 20px;">Confirm your details</p>
+            
+            <div class="menu-list" style="margin-bottom: 20px;">
+                <div class="menu-item"><div class="menu-icon">📷</div><div class="menu-info"><h4>Design Image</h4><p>1 image uploaded</p></div><i class="fas fa-check-circle" style="color: var(--success);"></i></div>
+                <div class="menu-item"><div class="menu-icon">📏</div><div class="menu-info"><h4>Measurements</h4><p>Chest: 40" • Waist: 34"</p></div><i class="fas fa-check-circle" style="color: var(--success);"></i></div>
+                <div class="menu-item"><div class="menu-icon">👔</div><div class="menu-info"><h4>Type</h4><p>Senator Wear</p></div><i class="fas fa-check-circle" style="color: var(--success);"></i></div>
+            </div>
+            
+            <button class="btn-primary" onclick="showToast('Order placed successfully! ', 'success'); setTimeout(() => navigate('ordersScreen'), 1500);">Place Order</button>
+        </div>
+    </div>
+
+    <!-- BOTTOM NAV -->
+    <div class="bottom-nav hidden" id="bottomNav">
+        <div class="nav-item active" onclick="navigate('homeScreen')" data-screen="homeScreen">
+            <i class="fas fa-home"></i><span>Home</span>
+        </div>
+        <div class="nav-item" onclick="navigate('ordersScreen')" data-screen="ordersScreen">
+            <i class="fas fa-clipboard-list"></i><span>Orders</span>
+        </div>
+        <div class="nav-center" onclick="navigate('placeOrderScreen')">
+            <i class="fas fa-plus"></i>
+        </div>
+        <div class="nav-item" onclick="navigate('messagesScreen')" data-screen="messagesScreen">
+            <i class="fas fa-comment-dots"></i><span>Messages</span>
+        </div>
+        <div class="nav-item" onclick="navigate('profileScreen')" data-screen="profileScreen">
+            <i class="fas fa-user"></i><span>Profile</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Navigation
+    function navigate(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
+        
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        const navItem = document.querySelector(`[data-screen="${screenId}"]`);
+        if (navItem) navItem.classList.add('active');
+        
+        window.scrollTo(0, 0);
+    }
+
+    // Login    function handleLogin() {
+        const email = document.getElementById('loginEmail').value;
+        const pass = document.getElementById('loginPass').value;
+        if (!email || !pass) { showToast('Please fill all fields', 'error'); return; }
+        
+        localStorage.setItem('stitchlink_user', JSON.stringify({ name: 'Musa Ibrahim', email: email }));
+        document.getElementById('profileEmail').textContent = email;
+        showToast('Login successful!', 'success');
+        setTimeout(() => {
+            document.getElementById('loginScreen').classList.remove('active');
+            document.getElementById('bottomNav').classList.remove('hidden');
+            navigate('homeScreen');
+        }, 800);
+    }
+
+    // Logout
+    function handleLogout() {
+        localStorage.removeItem('stitchlink_user');
+        location.reload();
+    }
+
+    // Order Steps
+    let currentStep = 1;
+    function nextStep() {
+        if (currentStep < 4) {
+            document.getElementById(`step${currentStep}`).classList.remove('active');
+            document.getElementById(`formStep${currentStep}`).classList.add('hidden');
+            currentStep++;
+            document.getElementById(`step${currentStep}`).classList.add('active');
+            document.getElementById(`formStep${currentStep}`).classList.remove('hidden');
+        }
+    }
+
+    // Toast Notification
+    function showToast(msg, type = '') {
+        const toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.className = 'toast ' + type + ' show';
+        setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    // Check login on load
+    window.onload = () => {
+        const user = localStorage.getItem('stitchlink_user');
+        if (user) {
+            const userData = JSON.parse(user);
+            document.getElementById('profileName').textContent = userData.name;
+            document.getElementById('profileEmail').textContent = userData.email;
+            document.getElementById('loginScreen').classList.remove('active');
+            document.getElementById('bottomNav').classList.remove('hidden');            navigate('homeScreen');
+        }
+    };
+</script>
+</body>
+</html>
