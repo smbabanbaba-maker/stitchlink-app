@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>StitchLink - Find Trusted Tailors</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            font-family: 'Inter', sans-serif;
+        }
+
+        :root {
+            --primary: #7c3aed;
+            --primary-dark: #6d28d9;
+            --primary-light: #8b5cf6;
+            --secondary: #f3f4f6;
+            --background: #f9fafb;
+            --surface: #ffffff;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --text-light: #9ca3af;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --border: #e5e7eb;
+            --purple-50: #f5f3ff;
+            --purple-100: #ede9fe;
+            --purple-200: #ddd6fe;
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            background: var(--background);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            max-width: 480px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .screen {            display: none;
+            animation: fadeIn 0.3s ease;
+            padding-bottom: 100px;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Header */
+        .app-header {
+            background: white;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .menu-btn {
+            font-size: 22px;
+            color: var(--text-primary);
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .notification-btn {
+            position: relative;
+            font-size: 22px;
+            color: var(--text-primary);
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: var(--error);
+            color: white;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        /* Search Bar */
+        .search-container {
+            padding: 14px 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-bar {
+            flex: 1;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 14px 12px 44px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-size: 14px;
+            background: var(--secondary);
+            outline: none;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 14px;            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+            font-size: 16px;
+        }
+
+        .filter-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: var(--purple-100);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+            color: var(--primary);
+        }
+
+        /* Hero Banner */
+        .hero-banner {
+            margin: 0 20px 20px;
+            border-radius: 16px;
+            overflow: hidden;
+            position: relative;
+            height: 160px;
+            background: linear-gradient(135deg, #6d28d9 0%, #4c1d95 100%);
+        }
+
+        .hero-banner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.5;
+        }
+
+        .hero-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 20px;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .trusted-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 10px;
+            border-radius: 16px;
+            font-size: 11px;
+            font-weight: 600;
+            width: fit-content;
+            margin-bottom: 10px;
+        }
+
+        .hero-title {
+            font-size: 24px;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 6px;
+        }
+
+        .hero-subtitle {
+            font-size: 13px;
+            opacity: 0.95;
+            margin-bottom: 16px;
+        }
+
+        .explore-btn {
+            background: white;
+            color: var(--primary);
+            padding: 12px 24px;
+            border-radius: 20px;
+            border: none;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            width: fit-content;
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            padding: 0 20px 24px;
+        }
+
+        .action-item {
+            display: flex;
+            flex-direction: column;            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .action-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            transition: transform 0.2s;
+        }
+
+        .action-item:active .action-icon {
+            transform: scale(0.95);
+        }
+
+        .action-icon.purple { background: var(--purple-100); color: var(--primary); }
+        .action-icon.yellow { background: #fef3c7; color: var(--warning); }
+        .action-icon.green { background: #d1fae5; color: var(--success); }
+        .action-icon.blue { background: #dbeafe; color: #3b82f6; }
+        .action-icon.pink { background: #fce7f3; color: #ec4899; }
+        .action-icon.teal { background: #ccfbf1; color: #14b8a6; }
+
+        .action-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-align: center;
+            font-weight: 500;
+        }
+
+        /* Section Header */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px 14px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        .view-all {
+            color: var(--primary);
+            font-weight: 700;            font-size: 13px;
+            cursor: pointer;
+        }
+
+        /* Tailor Cards */
+        .tailor-list {
+            padding: 0 20px 20px;
+            display: flex;
+            gap: 14px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .tailor-list::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tailor-card {
+            min-width: 200px;
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .tailor-card:active {
+            transform: scale(0.98);
+        }
+
+        .tailor-image-wrapper {
+            position: relative;
+            height: 180px;
+            overflow: hidden;
+        }
+
+        .tailor-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .verified-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--primary);
+            color: white;            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .tailor-info {
+            padding: 14px;
+        }
+
+        .tailor-name {
+            font-weight: 700;
+            font-size: 14px;
+            margin-bottom: 3px;
+        }
+
+        .tailor-specialty {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .tailor-rating {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-bottom: 6px;
+        }
+
+        .stars {
+            color: var(--warning);
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .rating-count {
+            color: var(--text-light);
+            font-size: 12px;
+        }
+
+        .tailor-price {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 14px;
+        }
+
+        /* How it Works */        .how-it-works {
+            padding: 0 20px 24px;
+        }
+
+        .steps-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 16px;
+            position: relative;
+        }
+
+        .steps-container::before {
+            content: '';
+            position: absolute;
+            top: 28px;
+            left: 35px;
+            right: 35px;
+            height: 2px;
+            background: var(--purple-100);
+            z-index: 0;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            z-index: 1;
+            flex: 1;
+        }
+
+        .step-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            position: relative;
+        }
+
+        .step-icon.purple { background: var(--purple-100); color: var(--primary); }
+        .step-icon.yellow { background: #fef3c7; color: var(--warning); }
+        .step-icon.green { background: #d1fae5; color: var(--success); }
+        .step-icon.blue { background: #dbeafe; color: #3b82f6; }
+
+        .step-number {
+            position: absolute;            top: -4px;
+            right: -4px;
+            background: var(--primary);
+            color: white;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .step-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-align: center;
+            font-weight: 500;
+        }
+
+        /* My Orders Section */
+        .my-orders {
+            padding: 0 20px 24px;
+        }
+
+        .order-card {
+            background: white;
+            border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 10px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            cursor: pointer;
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .order-info {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .order-image {            width: 56px;
+            height: 56px;
+            border-radius: 10px;
+            object-fit: cover;
+        }
+
+        .order-details h3 {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 3px;
+        }
+
+        .order-details p {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 2px;
+        }
+
+        .order-status {
+            padding: 5px 12px;
+            border-radius: 16px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .status-in-progress {
+            background: var(--purple-100);
+            color: var(--primary);
+        }
+
+        .status-ready {
+            background: #fef3c7;
+            color: var(--warning);
+        }
+
+        .order-progress {
+            display: flex;
+            gap: 6px;
+            margin-top: 10px;
+        }
+
+        .progress-dot {
+            flex: 1;
+            height: 5px;
+            background: var(--purple-100);
+            border-radius: 3px;
+        }
+
+        .progress-dot.active {
+            background: var(--primary);        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            right: 0;
+            max-width: 480px;
+            background: white;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 10px 0 22px;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            padding: 6px 18px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: all 0.3s;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+        }
+
+        .nav-item i {
+            font-size: 22px;
+        }
+
+        .nav-item span {
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .fab {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin-top: -28px;
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4);
+            cursor: pointer;
+            border: none;
+            transition: transform 0.2s;
+        }
+
+        .fab:active {
+            transform: scale(0.95);
+        }
+
+        /* Floating Tools Button */
+        .tools-fab {
+            position: fixed;
+            left: 18px;
+            bottom: 90px;
+            width: 52px;
+            height: 52px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4);
+            cursor: pointer;
+            z-index: 999;
+            animation: pulse 2s infinite;
+            border: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            body {
+                max-width: 100%;
+            }
+            
+            .bottom-nav, .fab, .tools-fab {
+                left: 0;
+                right: 0;
+                transform: none;                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Home Screen -->
+    <div id="home" class="screen active">
+        <div class="app-header">
+            <div class="header-left">
+                <button class="menu-btn"><i class="fas fa-bars"></i></button>
+                <div class="logo">
+                    <i class="fas fa-scissors"></i>
+                    StitchLink
+                </div>
+            </div>
+            <button class="notification-btn">
+                <i class="fas fa-bell"></i>
+                <span class="badge">3</span>
+            </button>
+        </div>
+
+        <div class="search-container">
+            <div class="search-bar">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="search-input" placeholder="Search tailors, designs...">
+            </div>
+            <button class="filter-btn"><i class="fas fa-sliders-h"></i></button>
+        </div>
+
+        <div class="hero-banner">
+            <img src="https://images.unsplash.com/photo-15581718134c6-1b4b4f236ed2?w=800&h=400&fit=crop" alt="African Tailor">
+            <div class="hero-content">
+                <div class="trusted-badge">
+                    <i class="fas fa-star"></i>
+                    Trusted Platform
+                </div>
+                <div class="hero-title">Find trusted tailors near you</div>
+                <div class="hero-subtitle">Quality stitching, delivered on time.</div>
+                <button class="explore-btn">Explore Tailors</button>
+            </div>
+        </div>
+
+        <div class="quick-actions">
+            <div class="action-item">
+                <div class="action-icon purple"><i class="fas fa-search"></i></div>
+                <div class="action-label">Browse Tailors</div>
+            </div>
+            <div class="action-item">                <div class="action-icon yellow"><i class="fas fa-ruler-combined"></i></div>
+                <div class="action-label">Measurements</div>
+            </div>
+            <div class="action-item">
+                <div class="action-icon green"><i class="fas fa-truck"></i></div>
+                <div class="action-label">Track Orders</div>
+            </div>
+            <div class="action-item">
+                <div class="action-icon blue"><i class="fas fa-comments"></i></div>
+                <div class="action-label">Chat</div>
+            </div>
+            <div class="action-item">
+                <div class="action-icon yellow"><i class="fas fa-star"></i></div>
+                <div class="action-label">Reviews</div>
+            </div>
+            <div class="action-item">
+                <div class="action-icon purple"><i class="fas fa-lock"></i></div>
+                <div class="action-label">Payments</div>
+            </div>
+            <div class="action-item">
+                <div class="action-icon pink"><i class="fas fa-bell"></i></div>
+                <div class="action-label">Updates</div>
+            </div>
+            <div class="action-item">
+                <div class="action-icon teal"><i class="fas fa-user"></i></div>
+                <div class="action-label">Profile</div>
+            </div>
+        </div>
+
+        <div class="section-header">
+            <div class="section-title">Popular Tailors</div>
+            <div class="view-all">View all</div>
+        </div>
+
+        <div class="tailor-list">
+            <div class="tailor-card" onclick="navigateTo('tailor-profile')">
+                <div class="tailor-image-wrapper">
+                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop" alt="Bashir" class="tailor-image">
+                    <div class="verified-badge"><i class="fas fa-check"></i></div>
+                </div>
+                <div class="tailor-info">
+                    <div class="tailor-name">Bashir Tailors</div>
+                    <div class="tailor-specialty">Men's Wear Specialist</div>
+                    <div class="tailor-rating">
+                        <span class="stars"><i class="fas fa-star"></i> 4.8</span>
+                        <span class="rating-count">(120)</span>
+                    </div>
+                    <div class="tailor-price">From ₦5,000</div>
+                </div>
+            </div>
+            <div class="tailor-card" onclick="navigateTo('tailor-profile')">
+                <div class="tailor-image-wrapper">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=400&fit=crop" alt="Aisha" class="tailor-image">
+                    <div class="verified-badge"><i class="fas fa-check"></i></div>
+                </div>
+                <div class="tailor-info">
+                    <div class="tailor-name">Aisha Designs</div>
+                    <div class="tailor-specialty">Women's Wear</div>
+                    <div class="tailor-rating">
+                        <span class="stars"><i class="fas fa-star"></i> 4.9</span>
+                        <span class="rating-count">(150)</span>
+                    </div>
+                    <div class="tailor-price">From ₦6,000</div>
+                </div>
+            </div>
+
+            <div class="tailor-card" onclick="navigateTo('tailor-profile')">
+                <div class="tailor-image-wrapper">
+                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop" alt="Zee" class="tailor-image">
+                    <div class="verified-badge"><i class="fas fa-check"></i></div>
+                </div>
+                <div class="tailor-info">
+                    <div class="tailor-name">Zee Stitches</div>
+                    <div class="tailor-specialty">Kaftans & Wear</div>
+                    <div class="tailor-rating">
+                        <span class="stars"><i class="fas fa-star"></i> 4.7</span>
+                        <span class="rating-count">(98)</span>
+                    </div>
+                    <div class="tailor-price">From ₦4,000</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="how-it-works">
+            <div class="section-header">
+                <div class="section-title">How it works</div>
+                <div class="view-all">View all</div>
+            </div>
+            <div class="steps-container">
+                <div class="step">
+                    <div class="step-icon purple">
+                        <i class="fas fa-search"></i>
+                        <div class="step-number">1</div>
+                    </div>
+                    <div class="step-label">Choose Tailor</div>
+                </div>
+                <div class="step">
+                    <div class="step-icon yellow">
+                        <i class="fas fa-shopping-cart"></i>                        <div class="step-number">2</div>
+                    </div>
+                    <div class="step-label">Place Order</div>
+                </div>
+                <div class="step">
+                    <div class="step-icon green">
+                        <i class="fas fa-tools"></i>
+                        <div class="step-number">3</div>
+                    </div>
+                    <div class="step-label">Tailor Works</div>
+                </div>
+                <div class="step">
+                    <div class="step-icon blue">
+                        <i class="fas fa-truck"></i>
+                        <div class="step-number">4</div>
+                    </div>
+                    <div class="step-label">Delivery</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="my-orders">
+            <div class="section-header">
+                <div class="section-title">My Orders</div>
+                <div class="view-all">View all</div>
+            </div>
+            <div class="order-card">
+                <div class="order-header">
+                    <div class="order-info">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop" alt="Order" class="order-image">
+                        <div class="order-details">
+                            <h3>Senator Wear • Bashir</h3>
+                            <p>Order #SL12345</p>
+                            <p>Expected: 24 May, 2024</p>
+                        </div>
+                    </div>
+                    <div class="order-status status-in-progress">In Progress</div>
+                </div>
+                <div class="order-progress">
+                    <div class="progress-dot active"></div>
+                    <div class="progress-dot active"></div>
+                    <div class="progress-dot"></div>
+                    <div class="progress-dot"></div>
+                </div>
+            </div>
+            <div class="order-card">
+                <div class="order-header">
+                    <div class="order-info">
+                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop" alt="Order" class="order-image">
+                        <div class="order-details">                            <h3>Ankara Gown • Aisha</h3>
+                            <p>Order #SL12289</p>
+                            <p>Expected: 10 May, 2024</p>
+                        </div>
+                    </div>
+                    <div class="order-status status-ready">Ready</div>
+                </div>
+                <div class="order-progress">
+                    <div class="progress-dot active"></div>
+                    <div class="progress-dot active"></div>
+                    <div class="progress-dot active"></div>
+                    <div class="progress-dot"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bottom-nav">
+            <div class="nav-item active" onclick="navigateTo('home')">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </div>
+            <div class="nav-item" onclick="navigateTo('my-orders')">
+                <i class="fas fa-clipboard-list"></i>
+                <span>Orders</span>
+            </div>
+            <button class="fab" onclick="navigateTo('place-order')">
+                <i class="fas fa-plus"></i>
+            </button>
+            <div class="nav-item" onclick="navigateTo('messages')">
+                <i class="fas fa-comment"></i>
+                <span>Messages</span>
+            </div>
+            <div class="nav-item" onclick="navigateTo('profile')">
+                <i class="fas fa-user"></i>
+                <span>Profile</span>
+            </div>
+        </div>
+
+        <button class="tools-fab">
+            <i class="fas fa-wrench"></i>
+        </button>
+    </div>
+
+    <!-- Placeholder Screens -->
+    <div id="tailor-profile" class="screen">
+        <div class="app-header">
+            <button class="back-btn" onclick="navigateTo('home')" style="background:none;border:none;font-size:22px;cursor:pointer;"><i class="fas fa-arrow-left"></i></button>
+            <div style="font-weight:800;font-size:18px;">Tailor Profile</div>
+            <div style="width:40px;"></div>
+        </div>        <div style="padding:40px 20px;text-align:center;">
+            <i class="fas fa-user-tie" style="font-size:80px;color:var(--primary);margin-bottom:20px;"></i>
+            <h2 style="margin-bottom:10px;">Tailor Profile</h2>
+            <p style="color:var(--text-secondary);">Full profile coming soon...</p>
+        </div>
+    </div>
+
+    <div id="my-orders" class="screen">
+        <div class="app-header">
+            <button class="back-btn" onclick="navigateTo('home')" style="background:none;border:none;font-size:22px;cursor:pointer;"><i class="fas fa-arrow-left"></i></button>
+            <div style="font-weight:800;font-size:18px;">My Orders</div>
+            <div style="width:40px;"></div>
+        </div>
+        <div style="padding:40px 20px;text-align:center;">
+            <i class="fas fa-clipboard-list" style="font-size:80px;color:var(--primary);margin-bottom:20px;"></i>
+            <h2 style="margin-bottom:10px;">Order History</h2>
+            <p style="color:var(--text-secondary);">View all your orders here...</p>
+        </div>
+    </div>
+
+    <div id="messages" class="screen">
+        <div class="app-header">
+            <button class="back-btn" onclick="navigateTo('home')" style="background:none;border:none;font-size:22px;cursor:pointer;"><i class="fas fa-arrow-left"></i></button>
+            <div style="font-weight:800;font-size:18px;">Messages</div>
+            <div style="width:40px;"></div>
+        </div>
+        <div style="padding:40px 20px;text-align:center;">
+            <i class="fas fa-comments" style="font-size:80px;color:var(--primary);margin-bottom:20px;"></i>
+            <h2 style="margin-bottom:10px;">Messages</h2>
+            <p style="color:var(--text-secondary);">Chat with your tailors...</p>
+        </div>
+    </div>
+
+    <div id="profile" class="screen">
+        <div class="app-header">
+            <button class="back-btn" onclick="navigateTo('home')" style="background:none;border:none;font-size:22px;cursor:pointer;"><i class="fas fa-arrow-left"></i></button>
+            <div style="font-weight:800;font-size:18px;">Profile</div>
+            <div style="width:40px;"></div>
+        </div>
+        <div style="padding:40px 20px;text-align:center;">
+            <i class="fas fa-user-circle" style="font-size:80px;color:var(--primary);margin-bottom:20px;"></i>
+            <h2 style="margin-bottom:10px;">My Profile</h2>
+            <p style="color:var(--text-secondary);">Manage your account...</p>
+        </div>
+    </div>
+
+    <div id="place-order" class="screen">
+        <div class="app-header">
+            <button class="back-btn" onclick="navigateTo('home')" style="background:none;border:none;font-size:22px;cursor:pointer;"><i class="fas fa-arrow-left"></i></button>
+            <div style="font-weight:800;font-size:18px;">New Order</div>            <div style="width:40px;"></div>
+        </div>
+        <div style="padding:40px 20px;text-align:center;">
+            <i class="fas fa-shopping-bag" style="font-size:80px;color:var(--primary);margin-bottom:20px;"></i>
+            <h2 style="margin-bottom:10px;">Place Order</h2>
+            <p style="color:var(--text-secondary);">Create your custom order...</p>
+        </div>
+    </div>
+
+    <script>
+        function navigateTo(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+            window.scrollTo(0, 0);
+        }
+    </script>
+</body>
+</html>
